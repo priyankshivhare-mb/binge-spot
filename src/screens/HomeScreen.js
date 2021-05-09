@@ -7,24 +7,30 @@ const API_KEY = '41afa174';
 class HomeScreen extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {movieTitle: ''};
+        this.state = {movieTitle: '', imdbRating: '', rottenTomatoes: '', metaCritic: ''};
     }
 
     handleTitleChange = movieTitle => {
-        this.setState({movieTitle})
+        this.setState({movieTitle, imdbRating: '', rottenTomatoes: '', metaCritic: ''})
     };
 
     handleOnSubmit = () => {
-        const {movieTitle} = this.state;
+        let {movieTitle} = this.state;
+        movieTitle = movieTitle.trim().replace(' ', '+');
 
         axios.get(`http://www.omdbapi.com/?t=${movieTitle}&apikey=${API_KEY}`).then((response) => {
             const data = response.data;
             const ratings = data.Ratings;
-            const imdbRating = ratings.filter(record => record.Source === 'Internet Movie Database')[0].Value;
-            const rottenTomatoes = ratings.filter(record => record.Source === 'Rotten Tomatoes')[0].Value;
-            const metaCritic = ratings.filter(record => record.Source === 'Metacritic')[0].Value;
+            const imdbArr = ratings.filter(record => record.Source === 'Internet Movie Database');
+            const rottenTomatoesArr = ratings.filter(record => record.Source === 'Rotten Tomatoes');
+            const metaCriticArr = ratings.filter(record => record.Source === 'Metacritic');
+            const imdbRating = imdbArr.length > 0 && imdbArr[0].Value;
+            const rottenTomatoes = rottenTomatoesArr.length > 0 && rottenTomatoesArr[0].Value;
+            const metaCritic = metaCriticArr.length > 0 && metaCriticArr[0].Value;
 
             this.setState({imdbRating, rottenTomatoes, metaCritic});
+        }).catch(err => {
+            console.log(err);
         });
     }
 
@@ -59,7 +65,7 @@ class HomeScreen extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-      padding: 10,
+        padding: 10,
     },
     heading: {
         fontSize: 16,
