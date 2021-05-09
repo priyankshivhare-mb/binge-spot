@@ -32,24 +32,24 @@ class HomeScreen extends React.Component {
         const {movieTitle, imdbRating, rottenTomatoes, metaCritic} = this.state;
 
         return (
-            <View>
-                <Text style={styles.text}>Get ratings</Text>
+            <View style={styles.container}>
+                <Text style={styles.heading}>Get ratings</Text>
                 <TextInput
-                    style={{height: 40}}
+                    style={styles.input}
                     placeholder="Enter movie title"
                     onChangeText={this.handleTitleChange}
                     defaultValue={movieTitle}
                 />
                 <Pressable onPress={this.handleOnSubmit}>
-                    <Text>Submit</Text>
+                    <Text style={styles.button}>Submit</Text>
                 </Pressable>
-                <Text>
+                <Text style={styles.result}>
                     {imdbRating && `IMDB: ${imdbRating}`}
                 </Text>
-                <Text>
+                <Text style={styles.result}>
                     {metaCritic && `Meta Critic: ${metaCritic}`}
                 </Text>
-                <Text>
+                <Text style={styles.result}>
                     {rottenTomatoes && `Rotten Tomatoes: ${rottenTomatoes}`}
                 </Text>
             </View>
@@ -58,8 +58,33 @@ class HomeScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    text: {
-        fontSize: 30
+    container: {
+      padding: 10,
+    },
+    heading: {
+        fontSize: 16,
+        marginTop: 20,
+        textAlign: 'center'
+    },
+    input: {
+        width: '100%',
+        borderBottomWidth: 1,
+        marginTop: 20,
+    },
+    button: {
+        backgroundColor: 'blue',
+        width: '100%',
+        height: '30%',
+        marginTop: 30,
+        textAlign: 'center',
+        padding: 10,
+        color: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    result: {
+        fontSize: 20,
+        fontWeight: 'bold',
     }
 });
 
