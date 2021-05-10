@@ -20,7 +20,8 @@ class HomeScreen extends React.Component {
     handleTitleChange = movieTitle => {
         this.setState({movieTitle, imdb: '', rottenTomatoes: '', metaCritic: '', showWarning: false});
         if (movieTitle.length >= 3) {
-            axios.get(`http://www.omdbapi.com?s=${movieTitle}&apikey=${API_KEY}`).then(response => {
+            const truncatedMovieTitle = movieTitle.trim().replace(' ', '+');
+            axios.get(`http://www.omdbapi.com?s=${truncatedMovieTitle}&apikey=${API_KEY}`).then(response => {
                 const searchArr = response.data.Search;
                 if (searchArr) {
                     const titleSuggestions = searchArr.map(movieData => movieData.Title);
