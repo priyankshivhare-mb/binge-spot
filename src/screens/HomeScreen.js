@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     heading: {
         fontSize: 16,
         marginTop: 20,
-        textAlign: 'center'
+        textAlign: 'left'
     },
     input: {
         width: '100%',

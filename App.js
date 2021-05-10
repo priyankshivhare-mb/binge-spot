@@ -14,6 +14,7 @@ const navigator = createStackNavigator(
         backgroundColor: '#3f51b5',
       },
       headerTintColor: '#fff',
+      headerTitleAlign: 'center',
     },
   }
 );
