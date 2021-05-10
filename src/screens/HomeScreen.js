@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import {flattenDeep, find} from "lodash";
+import {flattenDeep} from "lodash";
 import {Text, TextInput, View, StyleSheet, Pressable} from "react-native";
 import {API_KEY, ratingSources, sourcesEnum} from "../constants/config";
 
