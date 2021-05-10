@@ -24,7 +24,6 @@ class HomeScreen extends React.Component {
                 const searchArr = response.data.Search;
                 if (searchArr) {
                     const titleSuggestions = searchArr.map(movieData => movieData.Title);
-                    console.log(titleSuggestions);
                     this.setState({titleSuggestions});
                 }
             });
@@ -84,7 +83,7 @@ class HomeScreen extends React.Component {
                     )
                 }
 
-                <Pressable onPress={this.handleOnSubmit}>
+                <Pressable style={styles.buttonContainer} onPress={this.handleOnSubmit}>
                     <Text style={styles.button}>Submit</Text>
                 </Pressable>
                 {!imdb && !metaCritic && !rottenTomatoes && showWarning && (
@@ -120,16 +119,22 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         marginTop: 20,
     },
+    buttonContainer: {
+        padding: 14,
+    },
     button: {
-        backgroundColor: 'blue',
+        backgroundColor: '#3f51b5',
         width: '100%',
-        height: '30%',
-        marginTop: 30,
-        textAlign: 'center',
-        padding: 10,
-        color: '#fff',
+        alignItems: 'center',
+        flexDirection: 'row',
+        height: 50,
         justifyContent: 'center',
-        alignItems: 'center'
+        textAlign: 'center',
+        marginTop: 50,
+        elevation: 3,
+        color: '#fff',
+        textAlignVertical: 'center',
+        borderRadius: 6,
     },
     result: {
         fontSize: 20,

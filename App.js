@@ -10,6 +10,10 @@ const navigator = createStackNavigator(
     initialRouteName: "Home",
     defaultNavigationOptions: {
       title: "BINGE SPOT",
+      headerStyle: {
+        backgroundColor: '#3f51b5',
+      },
+      headerTintColor: '#fff',
     },
   }
 );
