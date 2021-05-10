@@ -1,17 +1,17 @@
 import React from "react";
 import axios from "axios";
+import { flattenDeep, find } from "lodash";
 import {Text, TextInput, View, StyleSheet, Pressable} from "react-native";
-
-const API_KEY = '41afa174';
+import { API_KEY, ratingSources, sourcesEnum } from "../constants/config";
 
 class HomeScreen extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {movieTitle: '', imdbRating: '', rottenTomatoes: '', metaCritic: ''};
+        this.state = {movieTitle: '', imdb: '', rottenTomatoes: '', metaCritic: '', showWarning: false};
     }
 
     handleTitleChange = movieTitle => {
-        this.setState({movieTitle, imdbRating: '', rottenTomatoes: '', metaCritic: ''})
+        this.setState({movieTitle, imdb: '', rottenTomatoes: '', metaCritic: '', showWarning: false})
     };
 
     handleOnSubmit = () => {
@@ -20,22 +20,24 @@ class HomeScreen extends React.Component {
 
         axios.get(`http://www.omdbapi.com/?t=${movieTitle}&apikey=${API_KEY}`).then((response) => {
             const data = response.data;
-            const ratings = data.Ratings;
-            const imdbArr = ratings.filter(record => record.Source === 'Internet Movie Database');
-            const rottenTomatoesArr = ratings.filter(record => record.Source === 'Rotten Tomatoes');
-            const metaCriticArr = ratings.filter(record => record.Source === 'Metacritic');
-            const imdbRating = imdbArr.length > 0 && imdbArr[0].Value;
-            const rottenTomatoes = rottenTomatoesArr.length > 0 && rottenTomatoesArr[0].Value;
-            const metaCritic = metaCriticArr.length > 0 && metaCriticArr[0].Value;
+            const movieRatings = flattenDeep(data.Ratings);
+            const ratings = ratingSources.reduce((acc, source) => {
+                const filteredRecord = movieRatings.find(record => record.Source === source);
+                if (filteredRecord) {
+                    acc[sourcesEnum[filteredRecord.Source]] = filteredRecord.Value;
+                }
+                return acc;
+            }, {});
+            const { imdb, rottenTomatoes, metaCritic } = ratings;
 
-            this.setState({imdbRating, rottenTomatoes, metaCritic});
+            this.setState({imdb, rottenTomatoes, metaCritic, showWarning: true});
         }).catch(err => {
             console.log(err);
         });
     }
 
     render() {
-        const {movieTitle, imdbRating, rottenTomatoes, metaCritic} = this.state;
+        const {movieTitle, imdb, rottenTomatoes, metaCritic, showWarning} = this.state;
 
         return (
             <View style={styles.container}>
@@ -49,8 +51,13 @@ class HomeScreen extends React.Component {
                 <Pressable onPress={this.handleOnSubmit}>
                     <Text style={styles.button}>Submit</Text>
                 </Pressable>
+                { !imdb && !metaCritic && !rottenTomatoes && showWarning && (
+                    <Text style={styles.noResult}>
+                        No ratings found!
+                    </Text>
+                )}
                 <Text style={styles.result}>
-                    {imdbRating && `IMDB: ${imdbRating}`}
+                    {imdb && `IMDB: ${imdb}`}
                 </Text>
                 <Text style={styles.result}>
                     {metaCritic && `Meta Critic: ${metaCritic}`}
@@ -91,7 +98,12 @@ const styles = StyleSheet.create({
     result: {
         fontSize: 20,
         fontWeight: 'bold',
-    }
+    },
+    noResult: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: 'red',
+    },
 });
 
 export default HomeScreen;
