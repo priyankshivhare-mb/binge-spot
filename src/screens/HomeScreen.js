@@ -1,7 +1,7 @@
 import React from "react";
 import axios from "axios";
 import {flattenDeep, debounce} from "lodash";
-import {Text, TextInput, View, StyleSheet, Pressable} from "react-native";
+import {Text, TextInput, View, StyleSheet, Pressable, Image, ScrollView} from "react-native";
 import {API_KEY, ratingSources, sourcesEnum} from "../constants/config";
 
 class HomeScreen extends React.Component {
@@ -12,6 +12,7 @@ class HomeScreen extends React.Component {
             imdb: '',
             rottenTomatoes: '',
             metaCritic: '',
+            poster: '',
             showWarning: false,
             titleSuggestions: []
         };
@@ -43,6 +44,7 @@ class HomeScreen extends React.Component {
 
         this.getApiResponse(movieTitle, false).then((response) => {
             const data = response.data;
+            const poster = data.Poster;
             const movieRatings = flattenDeep(data.Ratings);
             const ratings = ratingSources.reduce((acc, source) => {
                 const filteredRecord = movieRatings.find(record => record.Source === source);
@@ -53,7 +55,7 @@ class HomeScreen extends React.Component {
             }, {});
             const {imdb, rottenTomatoes, metaCritic} = ratings;
 
-            this.setState({imdb, rottenTomatoes, metaCritic, showWarning: true});
+            this.setState({imdb, rottenTomatoes, metaCritic, showWarning: true, poster});
         }).catch(err => {
             console.log(err);
         });
@@ -64,7 +66,7 @@ class HomeScreen extends React.Component {
     }
 
     render() {
-        const {movieTitle, imdb, rottenTomatoes, metaCritic, showWarning, titleSuggestions} = this.state;
+        const {movieTitle, imdb, rottenTomatoes, metaCritic, showWarning, titleSuggestions, poster} = this.state;
 
         return (
             <View style={styles.container}>
@@ -96,15 +98,20 @@ class HomeScreen extends React.Component {
                         No ratings found!
                     </Text>
                 )}
-                <Text style={styles.result}>
-                    {imdb && `IMDB: ${imdb}`}
-                </Text>
-                <Text style={styles.result}>
-                    {metaCritic && `Meta Critic: ${metaCritic}`}
-                </Text>
-                <Text style={styles.result}>
-                    {rottenTomatoes && `Rotten Tomatoes: ${rottenTomatoes}`}
-                </Text>
+                <ScrollView>
+                    {poster ? <View>
+                        <Image source={{uri: poster}} style={styles.poster}/>
+                    </View>: null}
+                    <Text style={styles.result}>
+                        {imdb && `IMDB: ${imdb}`}
+                    </Text>
+                    <Text style={styles.result}>
+                        {metaCritic && `Meta Critic: ${metaCritic}`}
+                    </Text>
+                    <Text style={styles.result}>
+                        {rottenTomatoes && `Rotten Tomatoes: ${rottenTomatoes}`}
+                    </Text>
+                </ScrollView>
             </View>
         );
     }
@@ -142,8 +149,8 @@ const styles = StyleSheet.create({
         borderRadius: 6,
     },
     result: {
-        fontSize: 20,
-        fontWeight: 'bold',
+        fontSize: 16,
+        marginTop: 20,
     },
     noResult: {
         fontSize: 20,
@@ -154,7 +161,11 @@ const styles = StyleSheet.create({
         backgroundColor: '#ddd',
         color: 'gray',
         padding: 10,
-    }
+    },
+    poster: {
+        width: 300,
+        height: 300,
+    },
 });
 
 export default HomeScreen;
