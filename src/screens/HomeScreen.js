@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import {flattenDeep} from "lodash";
+import {flattenDeep, debounce} from "lodash";
 import {Text, TextInput, View, StyleSheet, Pressable} from "react-native";
 import {API_KEY, ratingSources, sourcesEnum} from "../constants/config";
 
@@ -17,11 +17,15 @@ class HomeScreen extends React.Component {
         };
     }
 
+    getApiResponse = (movieTitle, searchByTitle=true) => {
+        return axios.get(`http://www.omdbapi.com?${searchByTitle ? 's' : 't'}=${movieTitle}&apikey=${API_KEY}`);
+    }
+
     handleTitleChange = movieTitle => {
         this.setState({movieTitle, imdb: '', rottenTomatoes: '', metaCritic: '', showWarning: false});
         if (movieTitle.length >= 3) {
             const truncatedMovieTitle = movieTitle.trim().replace(' ', '+');
-            axios.get(`http://www.omdbapi.com?s=${truncatedMovieTitle}&apikey=${API_KEY}`).then(response => {
+            this.getApiResponse(truncatedMovieTitle).then(response => {
                 const searchArr = response.data.Search;
                 if (searchArr) {
                     const titleSuggestions = searchArr.map(movieData => movieData.Title);
@@ -37,7 +41,7 @@ class HomeScreen extends React.Component {
         let {movieTitle} = this.state;
         movieTitle = movieTitle.trim().replace(' ', '+');
 
-        axios.get(`http://www.omdbapi.com/?t=${movieTitle}&apikey=${API_KEY}`).then((response) => {
+        this.getApiResponse(movieTitle, false).then((response) => {
             const data = response.data;
             const movieRatings = flattenDeep(data.Ratings);
             const ratings = ratingSources.reduce((acc, source) => {
@@ -68,7 +72,7 @@ class HomeScreen extends React.Component {
                 <TextInput
                     style={styles.input}
                     placeholder="Enter movie title"
-                    onChangeText={this.handleTitleChange}
+                    onChangeText={debounce(this.handleTitleChange, 500)}
                     defaultValue={movieTitle}
                 />
                 {
